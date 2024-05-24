@@ -13,3 +13,6 @@ Just follow these steps:
 4. Finally, run: `nix run home-manager/release-23.05 switch`
 
 And that's it. You're up and running with a dead simple, cross-platform home-manager configuration.
+
+PS.
+1. https://github.com/EmergentMind/nix-config/blob/dev/justfile # from this file and project

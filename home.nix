@@ -9,17 +9,21 @@ in
     ## Modularize your home.nix by moving statements into other files
   ];
 
-  home.username = "your-username";
+  home.username = "bill";
   home.homeDirectory =
-    if isLinux then "/home/your-username" else
-    if isDarwin then "/Users/your-username" else unsupported;
+    if isLinux then "/home/bill" else
+    if isDarwin then "/Users/bill" else unsupported;
 
-  home.stateVersion = "23.05"; # Don't change this. This will not upgrade your home-manager.
+  home.stateVersion = "24.05"; # Don't change this. This will not upgrade your home-manager.
   programs.home-manager.enable = true;
 
   home.packages = with pkgs; ([
     # Common packages
     hello
+    just
+    neovim
+    proxychains-ng
+    #fd
   ] ++ lib.optionals isLinux [
     # GNU/Linux packages
   ]
