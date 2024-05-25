@@ -20,10 +20,11 @@ in
   home.packages = with pkgs; ([
     # Common packages
     hello
-    just
-    neovim
-    proxychains-ng
-    #fd
+    # just
+    # neovim
+    # proxychains-ng
+    # fzf
+    # fd
   ] ++ lib.optionals isLinux [
     # GNU/Linux packages
   ]

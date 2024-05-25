@@ -7,10 +7,10 @@ So, here's Dead Simple Home Manager, a straightforward and easy-to-understand ni
 Just follow these steps:
 
 1. First, install nix. I recommend [Zero-to-Nix](https://zero-to-nix.com/start/install) or the [official installer](https://nixos.org/download.html)
-2. Clone this repository: `git clone https://github.com/crasm/dead-simple-home-manager ~/.config/home-manager`
+2. Clone this repository: `git clone https://github.com/meicale/dead-simple-home-manager ~/.config/home-manager`
 3. Personalize `flake.nix` with your `user@host` and `system` values
 4. Personalize `home.nix` with your username and home directory
-4. Finally, run: `nix run home-manager/release-23.05 switch`
+4. Finally, run: `nix run home-manager/release-24.05 switch`
 
 And that's it. You're up and running with a dead simple, cross-platform home-manager configuration.
 
