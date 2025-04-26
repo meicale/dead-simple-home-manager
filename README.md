@@ -16,3 +16,4 @@ And that's it. You're up and running with a dead simple, cross-platform home-man
 
 PS.
 1. https://github.com/EmergentMind/nix-config/blob/dev/justfile # from this file and project
+2. 如果 home manager 并没有在 nex 中进行安装，使用 nix 临时脚本环境，比如nix shell nixpkgs#home-manager, 可以于是使用home manager。home manager 带有-b 选项，即首先用 nix 安装了home manager 之后，就可以直接用home manager 命令就可以使用杠 b 选项了
