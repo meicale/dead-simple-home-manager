@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 检查文件是否存在
-files=("wsl.conf" "fstab" "proxychains4.conf")
+files=("wsl.conf" "fstab" "bashrc")
 for file in "${files[@]}"; do
     if [ ! -f "$file" ]; then
         missing_files+=("$file")
