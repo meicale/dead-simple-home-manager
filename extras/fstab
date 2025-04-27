@@ -1,0 +1,2 @@
+# UNCONFIGURED FSTAB FOR BASE SYSTEM
+UUID=a1b25862-6d4c-4f62-8664-c912e842f6da /nix ext4 defaults,discard,errors=remount-ro,X-mount.mkdir 0 2
