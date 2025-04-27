@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 检查文件是否存在
-files=("wsl.conf" "fstab" "bashrc")
+files=("wsl.conf" "fstab")
 for file in "${files[@]}"; do
     if [ ! -f "$file" ]; then
         missing_files+=("$file")
@@ -25,3 +25,12 @@ for file in "${files[@]}"; do
 done
 
 echo "所有文件已成功复制到 /etc 目录。"
+
+nix_init_file="nix-init.sh"
+if [  -f "${nix_init_file}" ]; then
+    echo "正在复制 "${nix_init_file}" ..."
+    sudo cp -v  "${nix_init_file}" "/etc/profile.d/${nix_init_file}"  
+else
+    echo "错误：没有nix 激活文件 "${nix_init_file}" ..."
+fi
+echo "all done"

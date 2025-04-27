@@ -28,10 +28,17 @@ in
   #   '';
   # };
 
+  programs.bash = {
+  enable = true;
+  profileExtra = "exec zsh";
+  };
+
+
   home.packages = with pkgs; ([
     # Common packages
     # neovim
     hello
+    zsh
   ] ++ lib.optionals isLinux [
     # GNU/Linux packages
   ]
