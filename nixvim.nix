@@ -6,11 +6,12 @@
 # TODO: add nerd fonts to this.
   programs.nixvim = {
     enable = true;
+    defaultEditor = false;
 
-    # extraConfigLua = ''
-    #   -- Print a little welcome message when nvim is opened!
-    #   print("Hi, I'm nixvim!")
-    # '';
+    extraConfigLua = ''
+      -- Print a little welcome message when nvim is opened!
+      print("Hi, I'm nixvim!")
+    '';
 
     # options = {
     #   # number = true;         # Show line numbers

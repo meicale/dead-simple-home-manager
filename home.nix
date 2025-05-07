@@ -64,6 +64,7 @@ in
     source ${pkgs.zsh-autosuggestions}/share/zsh-autosuggestions/zsh-autosuggestions.zsh
     source ${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 # this is need changed to adhoc way.
+    export PATH=$HOME/.npm-global/bin:$PATH
     export ZVM_VI_SURROUND_BINDKEY=s-prefix
     export ZVM_VI_INSERT_ESCAPE_BINDKEY=jk
     export CUDA_HOME=/usr/local/cuda
@@ -92,6 +93,17 @@ in
     enableZshIntegration = true;
 };
 
+# this doesn't works at all
+  # xdg.configFile."pe" = {
+  #     enable = true;
+  #     recursive = true;
+  #     source = ./nvim/.config/nvim;
+  # };
+
+  xdg.configFile."tmux/tmux.conf".source = ./tmux/.config/tmux/.tmux.conf;
+  xdg.configFile."tmux/tmux.conf.local".source = ./tmux/.config/tmux/.tmux.conf.local;
+
+
 # Comment this on wsl to use vscode installed in windows
 #   programs.vscode = {
 #   enable = true;
@@ -108,12 +120,13 @@ in
     # pkgs.hello
 
     # direnv
+    aider-chat
     antibody
     aria2
     bat
     black
     # cargo
-    # cmake
+    cmake
     conda
     delta
     difftastic
@@ -123,10 +136,10 @@ in
     fd
     ffmpeg-full
     # fzf
-    # gcc
+    gcc
 # this is requiored by cuda 11.7 which is required by pytorch1.13
     # gcc11
-    # gnumake
+    gnumake
     gh
     go
     jless
@@ -138,7 +151,7 @@ in
     micromamba
     mpv
     #neovim
-    nodejs_20
+    nodejs_23
 # modify config file to use it.
     # proxychains-ng
     opencc
@@ -162,6 +175,7 @@ in
     tmux
     tre
     unzip
+    uv
     watchexec
     xsel
     yarn
