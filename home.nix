@@ -100,6 +100,7 @@ in
   #     source = ./nvim/.config/nvim;
   # };
 
+  programs.tmux.enable = true;
   xdg.configFile."tmux/tmux.conf".source = ./tmux/.config/tmux/.tmux.conf;
   xdg.configFile."tmux/tmux.conf.local".source = ./tmux/.config/tmux/.tmux.conf.local;
 
@@ -172,7 +173,6 @@ in
     stow
     thefuck
     tldr
-    tmux
     tre
     unzip
     uv
