@@ -1,0 +1,198 @@
+!^e::Send "{Edit}"
+^!r::Reload
+^CapsLock::CapsLock                                     ;Ctrl+CapsLock 触发 CapsLock
+CapsLock::Esc                                           ;CapsLock 映射 Esc
+Esc::`
++Esc::~
+
+; :o:gun::meicale@163.com
+; :o:myun::guanghua
+; :o:nemail::Hi, `n`n`nBest Regards, `nguanghua
+
+^#Space::Send "{Click Left}"
+; !#Space::Send "{Click Right}" ; doesn't work
+
+
+;; !h::Send  "{LEFT}"        ; ALT + h            ->    LEFT                 (Cursor left one character)
+;; !b::Send  "^{LEFT}"       ; ALT + b            ->    CTRL + LEFT          (Cursor left per word)
+;; !+h::Send "+{LEFT}"       ; ALT + SHIFT + h    ->    SHIFT + LEFT         (Select one character)
+;; !+b::Send "+^{LEFT}"      ; ALT + SHIFT + b    ->    SHIFT + CTRL + LEFT  (Select per word)
+;; !l::Send  "{RIGHT}"       ; ALT + l            ->    RIGHT                (Cursor right one character)
+;; !w::Send  "^{RIGHT}"      ; ALT + w            ->    CTRL + RIGHT         (Cursor right per word)
+;; !+l::Send "+{RIGHT}"      ; ALT + SHIFT + l    ->    SHIFT + RIGHT        (Select one character)
+;; !+w::Send "+^{RIGHT}"     ; ALT + SHIFT + W    ->    SHIFT + CTRL + RIGHT (Select per word)
+;; !+k::Send "+{UP}"         ; ALT + SHIFT + k    ->    SHIFT + UP           (Select one line)
+;; !+j::Send "+{DOWN}"       ; ALT + SHIFT + j    ->    SHIFT + LEFT         (Select one line)
+!^k::Send  "{UP}"          ; CTRL + ALT + k            ->    UP                   (Cursor up line)
+!^j::Send  "{DOWN}"        ; CTRL + ALT + j            ->    LEFT                 (Cursor down line)
+
+:o:fds::{!}{^}        ;如何输出特殊的符号
+:o:jkl::{!}{$}        ;如何输出特殊的符号
+:o:mtp::{_}tmp{-}     ;如何输出特殊的符号
+
+; :o:afc::sed -i '1i ``````flow' {!}{$} & sed -i '{$}a ``````' {!}{$}
+
+; common used directory
+
+; micromamba command
+::cdi::micromamba install
+::cui::micromamba uninstall
+::cpl::micromamba list
+::cel::micromamba env list
+::cae::micromamba activate
+::cde::micromamba deactivate
+::cce::micromamba create --yes --name
+::cre::micromamba remove --yes --all -n
+::cif:: micromamba install --yes --file
+::cip::micromamba install --yes
+::cfp::micromamba list | grep
+::csp::micromamba search
+::crp::micromamba remove --yes
+; tmux command
+::tn::tmux new -s
+::ta::tmux a -t
+::tk::tmux kill-session -t
+::tl::tmux ls
+; for git use
+::gs::git status
+::ga::git add
+::gc::git commit -m
+::gca::git commit -a -m
+::gac::git commit -a -m
+::gl::git log
+::pgc::proxychains git clone
+::gp::proxychains git pull
+::pgh::proxychains git push
+::gcm::git checkout master
+:o:gud::git commit -a -m "update" & git push
+::pgu::proxychains git commit -a -m "update" & git push
+
+; docker command
+::deo::docker exec -ti ollama ollama
+::dac::docker attach
+::dps::docker ps
+::dpsa::docker ps -a
+::dim::docker images
+::dsc::docker stop
+::drc::docker rm
+::dri::docker rmi
+::ldi::docker images
+::dil::docker image ls
+;docker images|grep none|awk '{print $3}'|xargs docker rmi ; remove all none taged image
+::drnia::docker images|grep none|awk {'}{{}print {$}3{}}{'}|xargs docker rmi
+;docker ps -a | grep "Exited" | awk '{print $1}' | xargs docker rm ;remove all stoped container
+::drsca::docker ps -a | grep Exited | awk {'}{{}print {$}1{}}{'} | xargs docker rm
+::dcp::docker container prune
+::dip::docker image prune
+::sac::docker stop $(docker ps -aq)
+::rac::docker rm $(docker ps -aq)
+
+; run sh
+::rbsh::source ~/.bashrc
+::crte:: micromamba remove --yes --all -n tf_cls
+::brta:: bash _tmp-run_all.sh |tee result_$(date {+}"%Y-%m-%d").log
+::tdct::python -c "import pytorch_nndct"
+::ptv::python -c "import torch; print(torch.__version__)"
+::tvv::python -c "import torchvision; print(torchvision.__version__)"
+::ptcv::python -c "import torch; print(torch.version.cuda)"
+::ptc:: python -c "import torch; print(torch.cuda.is_available())"
+::ptca::python -c "import torch; print(torch.cuda.get_arch_list())"
+::xtv::cat /etc/os-release
+
+; bash
+::his::history
+::hic::history -c
+::hid::history -d
+::jys::tar -xzvf
+::ys::tar -czvf
+::cgs::ls -lR|grep "{^}{-}"| wc -l
+::cdx::du -hd1
+;temp used
+::nvs::nvidia-smi
+::pir::pip install -r requirements.txt
+::sss::service ssh status
+::ssr::sudo service ssh restart
+
+; powershell
+::won::wsl -d nix -u bill
+::wot::wsl -d t -u bill
+::wsd::wsl --shutdown
+
+;# Persistent  ; Make the script persistent
+; Remap CapsLock to function as either Alt or Esc based on the duration of the press
+/*
+*CapsLock::RemapCapsLock()
+RemapCapsLock()
+{
+    ; Get the current tick count
+    cDown := A_TickCount
+    ; Send Alt key down
+    ; Send {Blind}{Alt Down}
+    Send "{Blind}{Alt Down}"
+    ; Wait for CapsLock to be released
+    KeyWait "CapsLock"
+    ; Calculate the duration of the press
+    duration := A_TickCount - cDown
+    ; If the duration is less than 150 milliseconds, send Alt Up and Esc
+    if (duration < 150)
+    {
+        Send "{Blind}{Alt Up}{Esc}"
+    }
+    else  ; Otherwise, send Alt Up
+    {
+        Send "{Blind}{Alt Up}"
+    }
+}
+*/
+
+*RShift::RemapRShift()
+RemapRShift()
+{
+    cDown := A_TickCount
+    Send "{Blind}{RShift Down}"
+    KeyWait "RShift"
+    duration := A_TickCount - cDown
+    if (duration < 100) {
+        Send "{Blind}{RShift Up}{]}"
+    }
+    else
+    {
+        Send "{Blind}{RShift Up}"
+    }
+}
+*LShift::RemapLShift()
+RemapLShift()
+{
+    cDown := A_TickCount
+    Send "{Blind}{LShift Down}"
+    KeyWait "LShift"
+    duration := A_TickCount - cDown
+    if (duration < 100) {
+        Send "{Blind}{LShift Up}{[}"
+    }
+    else
+    {
+        Send "{Blind}{LShift Up}"
+    }
+}
+
+#!p::{
+  WinTag := WinActive("A")
+  WinActivate "PotPlayer"
+  ; WinActivate "ffplay"
+  Send "{Space}"
+  WinActivate WinTag
+}
+#!h::{
+  WinTag := WinActive("A")
+  WinActivate "PotPlayer"
+  Send "{Left}"
+  WinActivate WinTag
+}
+#!l::{
+  WinTag := WinActive("A")
+  WinActivate "PotPlayer"
+  Send "{Right}"
+  WinActivate WinTag
+}
+
