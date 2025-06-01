@@ -40,7 +40,8 @@ in
   };
 
 
-  # home.file."alias.sh".source = ../../zsh/alias.sh;
+  home.file."alias.sh".source = ./zsh/alias.sh;
+  home.file.".cli_tmux_editor.sh".source = ./zsh/zsh-vi-tmux-editor.sh;
   programs.zsh = {
     enable = true;
 
@@ -67,6 +68,7 @@ in
     export PATH=$HOME/.npm-global/bin:$PATH
     export ZVM_VI_SURROUND_BINDKEY=s-prefix
     export ZVM_VI_INSERT_ESCAPE_BINDKEY=jk
+    export ZVM_VI_EDITOR="${config.home.homeDirectory}/.cli_tmux_editor.sh"
     export CUDA_HOME=/usr/local/cuda
     export PATH=$CUDA_HOME/bin:$PATH
     export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PAT
@@ -132,6 +134,7 @@ in
     delta
     difftastic
     diff-so-fancy
+    duckdb
     entr
     eza
     fd
@@ -169,6 +172,7 @@ in
     # sesh
     skim
     sox
+    sqlfluff
     sqlite
     stow
     thefuck
