@@ -1,0 +1,11 @@
+1. Windows 版本和基础配置
+Windows 使用的是企业版 ltsc 中文版 
+需要开启虚拟机和 wsl 微软服务 
+具体配置需要打开控制面板->程序>启动和关闭服务 勾选这两项,之后重启 之后使用 wsl --install 安装 wsl.
+没有 App store 也无法获取线上可用的刷行版,使用打包出来的 tar 进行导入
+
+2. nixos 尝试
+https://nix-community.github.io/NixOS-WSL/how-to/change-username.html 修改 NIXOS-WSL，用户名
+https://lavafroth.is-a.dev/post/cuda-on-nixos-without-sacrificing-ones-sanity/   flakes 方式使用cuda 
+更换nix store 具体映射路径，没有成功，存在权限管理问题，无法自动挂载
+发现的现象是：重此以后没有动作看，没有任何输出
