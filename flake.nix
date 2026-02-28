@@ -2,13 +2,13 @@
   description = "Your dead simple Home Manager configuration";
 
   inputs.nixpkgs = {
-    url = "github:nixos/nixpkgs/nixos-24.11";         ## Most stable, less downloads
+    url = "github:nixos/nixpkgs/nixos-25.11";         ## Most stable, less downloads
     # url = "github:nixos/nixpkgs/nixpkgs-unstable";  ## Bleeding edge packages
     # url = "github:nixos/nixpkgs/nixos-unstable";    ## Above, but with nixos tests
   };
 
   inputs.home-manager = {
-    url = "github:nix-community/home-manager/release-24.11";
+    url = "github:nix-community/home-manager/release-25.11";
 
     ## Track the master branch of Home Manager if you are not on a stable
     ## release
@@ -22,7 +22,7 @@
         inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, nixvim }: {
+  outputs = { self, nixpkgs, home-manager, nixvim, }: {
     homeConfigurations = {
       "bill" = home-manager.lib.homeManagerConfiguration ({
         modules = [ nixvim.homeManagerModules.nixvim (import ./home.nix) ];
@@ -30,6 +30,7 @@
           system = "x86_64-linux";
           # config.allowUnfree = true;
         };
+
       });
 
       "username@your-mac" = home-manager.lib.homeManagerConfiguration ({

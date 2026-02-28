@@ -39,6 +39,16 @@ export DEFAULT_PDF_READER="sioyek"
 #     fi
 # }
 
+# Replace ls with eza
+alias ls='eza'
+# Long format with headers and icons
+alias ll='eza -l --header --icons'
+# Long format including hidden files
+alias la='eza -la --header --icons'
+# Tree view shortcut
+alias tree='eza --tree'
+
+
 alias nv="NVIM_APPNAME=nn nvim"
 alias t="just"
 alias zl="zellij list-sessions"
