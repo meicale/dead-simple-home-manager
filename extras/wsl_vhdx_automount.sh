@@ -5,6 +5,12 @@ if ! mount | grep -q '/mnt/wsl/persistent'; then # 防止开多个terminal时多
 	sleep 1    # 等块设备出来
 fi
 
+if ! mount | grep -q '/mnt/wsl/workspace'; then # 防止开多个terminal时多次执行
+        /mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -Command 'wsl --mount  --vhd "J:\vhdxs\workspace.vhdx" --name "workspace" ' > /dev/null
+	sleep 1    # 等块设备出来
+fi
+
+
 
 if ! mount | grep -q '/nix'; then
 	/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -Command 'wsl --mount --bare --vhd "F:\vhds\nix.vhdx" ' > /dev/null

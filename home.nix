@@ -3,6 +3,21 @@ let
   isLinux = pkgs.stdenv.hostPlatform.isLinux;
   isDarwin = pkgs.stdenv.hostPlatform.isDarwin;
   unsupported = builtins.abort "Unsupported platform";
+  # 共享存储基础路径（可根据实际情况调整）
+  sharedBase = if isLinux then "/mnt/wsl/persistent" else "/Volumes/persistent" ;
+  
+  # XDG目录路径
+  xdgCacheHome = "${sharedBase}/cache";
+  xdgDataHome = "${sharedBase}/data";
+  xdgStateHome = "${sharedBase}/state";
+  
+  # Python相关路径
+  hfCacheDir = "${xdgCacheHome}/huggingface";
+  pipCacheDir = "${xdgCacheHome}/pip";
+  uvCacheDir = "${xdgCacheHome}/uv";
+  poetryCacheDir = "${xdgCacheHome}/poetry";
+  condaEnvDir = "${sharedBase}/conda/envs";
+  
 in
 {
   imports = [
@@ -10,6 +25,57 @@ in
     ./nixvim.nix
     ./lf.nix
   ];
+# XDG环境变量配置
+  xdg.enable = true;
+  xdg.cacheHome = xdgCacheHome;
+  xdg.dataHome = xdgDataHome;
+  xdg.stateHome = xdgStateHome;
+  
+  # 确保共享目录存在
+  home.activation.createSharedDirs = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    mkdir -p ${xdgCacheHome}/{huggingface,pip,uv,poetry,conda,atuin,node,yarn,npm,go-build,cargo}
+    mkdir -p ${xdgDataHome}/{atuin,zoxide,direnv,pipx}
+    mkdir -p ${xdgStateHome}/nix
+    mkdir -p ${sharedBase}/conda/envs
+  '';
+   # Shell环境变量
+  home.sessionVariables = {
+    # XDG标准
+    XDG_CACHE_HOME = xdgCacheHome;
+    XDG_DATA_HOME = xdgDataHome;
+    XDG_STATE_HOME = xdgStateHome;
+    
+    # Python相关
+    HF_HOME = hfCacheDir;
+    HUGGINGFACE_HUB_CACHE = hfCacheDir;
+    TRANSFORMERS_CACHE = "${hfCacheDir}/hub";
+    PIP_CACHE_DIR = pipCacheDir;
+    UV_CACHE_DIR = uvCacheDir;
+    POETRY_CACHE_DIR = poetryCacheDir;
+    
+    # Conda/Micromamba
+    CONDA_ENVS_PATH = condaEnvDir;
+    MAMBA_ROOT_PREFIX = "${sharedBase}/conda";
+    
+    # Node.js
+    npm_config_cache = "${xdgCacheHome}/npm";
+    YARN_CACHE_FOLDER = "${xdgCacheHome}/yarn";
+    
+    # Go
+    GOCACHE = "${xdgCacheHome}/go-build";
+    GOMODCACHE = "${xdgCacheHome}/go/mod";
+    
+    # Rust
+    CARGO_HOME = "${xdgDataHome}/cargo";
+    RUSTUP_HOME = "${xdgDataHome}/rustup";
+  };
+  
+  # 为不支持XDG的工具创建符号链接
+  home.file.".cache/huggingface".source = config.lib.file.mkOutOfStoreSymlink hfCacheDir;
+  home.file.".cache/pip".source = config.lib.file.mkOutOfStoreSymlink pipCacheDir;
+  home.file.".cache/uv".source = config.lib.file.mkOutOfStoreSymlink uvCacheDir;
+  home.file.".cache/poetry".source = config.lib.file.mkOutOfStoreSymlink poetryCacheDir;
+  home.file.".conda/envs".source = config.lib.file.mkOutOfStoreSymlink condaEnvDir;
 
   home.username = "bill";
   home.homeDirectory =
@@ -19,8 +85,21 @@ in
   home.stateVersion = "25.11"; # Don't change this. This will not upgrade your home-manager.
   programs.home-manager.enable = true;
 
+  
+  
+  # Atuin配置（使用XDG路径）
   programs.atuin = {
     enable = true;
+    settings = {
+      db_path = "${xdgDataHome}/atuin/history.db";
+      key_path = "${xdgDataHome}/atuin/key";
+      session_path = "${xdgDataHome}/atuin/session";
+      filter_mode_shell_up_key_binding = "directory" ;
+      ctrl_n_shortcuts = true;
+      enter_accept = true;
+      keymap_mode = "vim-normal";
+      records = true;
+    };
   };
 
   programs = {
@@ -40,6 +119,41 @@ in
 
   home.file."alias.sh".source = ./zsh/alias.sh;
   home.file.".cli_tmux_editor.sh".source = ./zsh/zsh-vi-tmux-editor.sh;
+
+  # Poetry配置
+  home.file.".config/pypoetry/config.toml".text = ''
+    [cache-dir]
+    "${poetryCacheDir}"
+  '';
+  
+  # UV配置
+  home.file.".config/uv/uv.toml".text = ''
+    [cache]
+    dir = "${uvCacheDir}"
+  '';
+  
+  # Pip配置
+  home.file.".config/pip/pip.conf".text = ''
+    [global]
+    cache-dir = ${pipCacheDir}
+  '';
+  
+  # Conda配置
+  home.file.".condarc".text = ''
+    envs_dirs:
+      - ${condaEnvDir}
+    pkgs_dirs:
+      - ${sharedBase}/conda/pkgs
+  '';
+  
+  # Micromamba配置
+  home.file.".mambarc".text = ''
+    root_prefix: ${sharedBase}/conda
+    envs_dirs:
+      - ${condaEnvDir}
+    pkgs_dirs:
+      - ${sharedBase}/conda/pkgs
+  '';
 
 # Bash 配置 - 自动切换到 zsh
   programs.bash = {
@@ -83,6 +197,20 @@ in
   # };
 
   programs.zsh.initExtra= ''
+      # 确保缓存目录存在
+      mkdir -p ${xdgCacheHome}/zsh
+      mkdir -p ${xdgDataHome}/zsh
+      
+      # Zsh缓存
+      export ZSH_CACHE_DIR="${xdgCacheHome}/zsh"
+      export ZSH_COMPDUMP="${xdgCacheHome}/zsh/zcompdump-$HOST"
+      
+      # Zoxide数据
+      export _ZO_DATA_DIR="${xdgDataHome}/zoxide"
+      
+      # Direnv数据
+      export DIRENV_LOG_FORMAT=""
+      export DIRENV_WATCHES="${xdgDataHome}/direnv/watches"    
     source ${pkgs.zsh-vi-mode}/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
     source ${pkgs.zsh-autosuggestions}/share/zsh-autosuggestions/zsh-autosuggestions.zsh
     source ${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
@@ -110,15 +238,23 @@ in
 
   programs.git = {
     enable = true;
-    lfs.enable = true;
-    settings.user.name = "meicale";
-    # userEmail = "test@163.com";
+    settings = {
+      user = {
+        name = "meicale";
+        # email = "test@163.com";
+      };
+      lfs = {
+        enable = true;
+        storage = "${sharedBase}/git/lfs";
+      };
+    };
   };
 
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
 };
+
 
 # this doesn't works at all
   # xdg.configFile."pe" = {
@@ -133,7 +269,7 @@ in
   xdg.configFile."tmux/tmux.conf".source = "${config.home.homeDirectory}/.config/home-manager/tmux/.config/tmux/.tmux.conf";
   xdg.configFile."tmux/tmux.conf.local".source = "${config.home.homeDirectory}/.config/home-manager/tmux/.config/tmux/.tmux.conf.local";
 
-  xdg.configFile."atuin/config.toml".source = ./extras/atuin.config.toml;
+  # xdg.configFile."atuin/config.toml".source = ./extras/atuin.config.toml;
 
 # Comment this on wsl to use vscode installed in windows
 #   programs.vscode = {
