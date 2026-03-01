@@ -191,7 +191,7 @@ in
     #neovim
     nodejs_24
 # modify config file to use it.
-    proxychains-ng
+    # proxychains-ng # avoid rebuild nix to run 
     opencc
     papis
     poetry

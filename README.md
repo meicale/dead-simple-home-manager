@@ -14,11 +14,11 @@ Structure
 Just follow these steps:
 
 1. First, install nix. I recommend [Zero-to-Nix](https://zero-to-nix.com/start/install) or the [official installer](https://nixos.org/download.html)
-2. Clone this repository: `git clone --recurse-submodules https://github.com/meicale/dead-simple-home-manager ~/.config/home-manage`. use `--recurse-submodules` to clone tmux, neovim, and other configs. Clone later is OK, too.
+2. Clone this repository: `git clone --recurse-submodules https://github.com/meicale/dead-simple-home-manager ~/.config/home-manager`. use `--recurse-submodules` to clone tmux, neovim, and other configs. Clone later is OK, too.
 3. Personalize `flake.nix` with your `user@host` and `system` values
 4. Personalize `home.nix` with your username and home directory
 5. Run to get home-manager one-time: `nix shell nixpkgs#home-manager`, you need to comment out the xdg config when running on `nix shell`
-6. Run to get new home: `home-manager switch -b backup`
+6. Run to get new home: `home-manager switch -b backup --impure`
 4. Finally, run: `nix run home-manager/release-24.05 switch`
 
 And that's it. You're up and running with a dead simple, cross-platform home-manager configuration.
