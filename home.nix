@@ -18,6 +18,9 @@ let
   poetryCacheDir = "${xdgCacheHome}/poetry";
   condaEnvDir = "${sharedBase}/conda/envs";
   
+  # PyTorch相关路径
+  torchCacheDir = "${xdgCacheHome}/torch";
+  
 in
 {
   imports = [
@@ -31,52 +34,19 @@ in
   xdg.dataHome = xdgDataHome;
   xdg.stateHome = xdgStateHome;
   
-  # 确保共享目录存在
-  home.activation.createSharedDirs = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    mkdir -p ${xdgCacheHome}/{huggingface,pip,uv,poetry,conda,atuin,node,yarn,npm,go-build,cargo}
-    mkdir -p ${xdgDataHome}/{atuin,zoxide,direnv,pipx}
-    mkdir -p ${xdgStateHome}/nix
-    mkdir -p ${sharedBase}/conda/envs
+  # 在home-manager switch时执行缓存配置
+  home.activation.setupCache = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    echo "设置缓存路径映射..."
+    if [ -f "${config.home.homeDirectory}/.cache_config.sh" ]; then
+        bash "${config.home.homeDirectory}/.cache_config.sh"
+    fi
   '';
-   # Shell环境变量
-  home.sessionVariables = {
-    # XDG标准
-    XDG_CACHE_HOME = xdgCacheHome;
-    XDG_DATA_HOME = xdgDataHome;
-    XDG_STATE_HOME = xdgStateHome;
-    
-    # Python相关
-    HF_HOME = hfCacheDir;
-    HUGGINGFACE_HUB_CACHE = hfCacheDir;
-    TRANSFORMERS_CACHE = "${hfCacheDir}/hub";
-    PIP_CACHE_DIR = pipCacheDir;
-    UV_CACHE_DIR = uvCacheDir;
-    POETRY_CACHE_DIR = poetryCacheDir;
-    
-    # Conda/Micromamba
-    CONDA_ENVS_PATH = condaEnvDir;
-    MAMBA_ROOT_PREFIX = "${sharedBase}/conda";
-    
-    # Node.js
-    npm_config_cache = "${xdgCacheHome}/npm";
-    YARN_CACHE_FOLDER = "${xdgCacheHome}/yarn";
-    
-    # Go
-    GOCACHE = "${xdgCacheHome}/go-build";
-    GOMODCACHE = "${xdgCacheHome}/go/mod";
-    
-    # Rust
-    CARGO_HOME = "${xdgDataHome}/cargo";
-    RUSTUP_HOME = "${xdgDataHome}/rustup";
-  };
+  # 环境变量由缓存配置脚本管理
+  # home.sessionVariables 已移至 scripts/cache_config.sh
   
-  # 为不支持XDG的工具创建符号链接
-  home.file.".cache/huggingface".source = config.lib.file.mkOutOfStoreSymlink hfCacheDir;
-  home.file.".cache/pip".source = config.lib.file.mkOutOfStoreSymlink pipCacheDir;
-  home.file.".cache/uv".source = config.lib.file.mkOutOfStoreSymlink uvCacheDir;
-  home.file.".cache/poetry".source = config.lib.file.mkOutOfStoreSymlink poetryCacheDir;
-  home.file.".conda/envs".source = config.lib.file.mkOutOfStoreSymlink condaEnvDir;
-
+  # 部署缓存配置脚本
+  home.file.".cache_config.sh".source = ./scripts/cache_config.sh;
+  home.file.".cache_config.sh".executable = true;
   home.username = "bill";
   home.homeDirectory =
     if isLinux then "/home/bill" else
@@ -141,7 +111,7 @@ in
   # Conda配置
   home.file.".condarc".text = ''
     envs_dirs:
-      - ${condaEnvDir}
+      - ${sharedBase}/conda/envs
     pkgs_dirs:
       - ${sharedBase}/conda/pkgs
   '';
@@ -150,7 +120,7 @@ in
   home.file.".mambarc".text = ''
     root_prefix: ${sharedBase}/conda
     envs_dirs:
-      - ${condaEnvDir}
+      - ${sharedBase}/conda/envs
     pkgs_dirs:
       - ${sharedBase}/conda/pkgs
   '';
@@ -159,6 +129,11 @@ in
   programs.bash = {
     enable = true;
     profileExtra = ''
+      # 加载缓存配置
+      if [ -f ~/.cache_config.sh ]; then
+          source ~/.cache_config.sh
+      fi
+      
       if [ -n "$BASH_EXECUTION_STRING" ]; then
         return
       fi
@@ -170,6 +145,11 @@ in
 
   # Bashrc - 用于非登录 shell（IDE）
   home.file.".bashrc".text = ''
+    # 加载缓存配置
+    if [ -f ~/.cache_config.sh ]; then
+        source ~/.cache_config.sh
+    fi
+    
     if [ -z "$ZSH_EXECUTION_STRING" ] && [ -t 1 ]; then
       if [ -n "$BASH_EXECUTION_STRING" ]; then
         return
@@ -197,6 +177,11 @@ in
   # };
 
   programs.zsh.initExtra= ''
+      # 加载缓存配置
+      if [ -f ~/.cache_config.sh ]; then
+          source ~/.cache_config.sh
+      fi
+      
       # 确保缓存目录存在
       mkdir -p ${xdgCacheHome}/zsh
       mkdir -p ${xdgDataHome}/zsh
@@ -255,6 +240,10 @@ in
     enableZshIntegration = true;
 };
 
+# home.file.".config/nvim" = {
+#   source = config.lib.file.mkOutOfStoreSymlink 
+#     "${config.home.homeDirectory}/dotfiles/nvim";
+# };
 
 # this doesn't works at all
   # xdg.configFile."pe" = {
