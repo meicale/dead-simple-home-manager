@@ -41,8 +41,6 @@ in
         bash "${config.home.homeDirectory}/.cache_config.sh"
     fi
   '';
-  # 环境变量由缓存配置脚本管理
-  # home.sessionVariables 已移至 scripts/cache_config.sh
 
   # 部署缓存配置脚本
   home.file.".cache_config.sh".source = ./scripts/cache_config.sh;
@@ -129,35 +127,41 @@ in
   programs.bash = {
     enable = true;
     profileExtra = ''
-      # 加载缓存配置
-      if [ -f ~/.cache_config.sh ]; then
-          source ~/.cache_config.sh
-      fi
+      echo "加载bash profile配置"
 
+      # 等待挂载完成（如果需要）
+      wait_for_mount() {
+          echo "等待挂载 /mnt/wsl/persistent..."
+          local max_wait=5
+          local count=0
+          while ! mount | grep -q '/mnt/wsl/persistent' && [ $count -lt $max_wait ]; do
+              sleep 1
+              count=$((count + 1))
+          done
+      }
+      
+      wait_for_mount
+
+      # eval "$(wt config shell init bash)" # this is useless, it jump to zsh
       if [ -n "$BASH_EXECUTION_STRING" ]; then
         return
       fi
       if [ -z "$ZSH_EXECUTION_STRING" ] && [ -t 1 ]; then
+        echo "wsl 登录，切换到zsh"
         exec zsh
       fi
 
-      eval "$(wt config shell init bash)"
+    '';
+    bashrcExtra = ''
+      echo "加载bashrc配置"
+      # 非登录Shell也自动切换到zsh
+      if [ -z "$ZSH_EXECUTION_STRING" ] && [ -t 1 ]; then
+        echo "ide 登录，切换到zsh"
+        exec zsh
+      fi
+
     '';
   };
-
-  # # Bashrc - 用于非登录 shell（IDE）
-  # home.file.".bashrc".text = ''
-  #   # 加载缓存配置
-  #   if [ -f ~/.cache_config.sh ]; then
-  #       source ~/.cache_config.sh
-  #   fi
-  #   if [ -z "$ZSH_EXECUTION_STRING" ] && [ -t 1 ]; then
-  #     if [ -n "$BASH_EXECUTION_STRING" ]; then
-  #       return
-  #     fi
-  #     exec zsh
-  #   fi
-  # '';
 
   programs.zsh = {
     enable = true;
@@ -178,29 +182,32 @@ in
   # };
 
   programs.zsh.initContent= ''
-      # 加载缓存配置
-      if [ -f ~/.cache_config.sh ]; then
-          source ~/.cache_config.sh
-      fi
 
-      # 确保缓存目录存在
-      mkdir -p ${xdgCacheHome}/zsh
-      mkdir -p ${xdgDataHome}/zsh
+    # 加载缓存配置
+    if [ -f ~/.config/home-manager/scripts/cache_envs.sh ]; then
+        source ~/.config/home-manager/scripts/cache_envs.sh
+    elif [ -f ~/.cache_config.sh ]; then
+        source ~/.cache_config.sh
+    fi
+    
+    # # 确保缓存目录存在
+    # mkdir -p ${xdgCacheHome}/zsh
+    # mkdir -p ${xdgDataHome}/zsh
 
-      # Zsh缓存
-      export ZSH_CACHE_DIR="${xdgCacheHome}/zsh"
-      export ZSH_COMPDUMP="${xdgCacheHome}/zsh/zcompdump-$HOST"
+    # Zsh缓存
+    export ZSH_CACHE_DIR="${xdgCacheHome}/zsh"
+    export ZSH_COMPDUMP="${xdgCacheHome}/zsh/zcompdump-$HOST"
 
-      # Zoxide数据
-      export _ZO_DATA_DIR="${xdgDataHome}/zoxide"
+    # Zoxide数据
+    export _ZO_DATA_DIR="${xdgDataHome}/zoxide"
 
-      # Direnv数据
-      export DIRENV_LOG_FORMAT=""
-      export DIRENV_WATCHES="${xdgDataHome}/direnv/watches"
+    # Direnv数据
+    export DIRENV_LOG_FORMAT=""
+    export DIRENV_WATCHES="${xdgDataHome}/direnv/watches"
     source ${pkgs.zsh-vi-mode}/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
     source ${pkgs.zsh-autosuggestions}/share/zsh-autosuggestions/zsh-autosuggestions.zsh
     source ${pkgs.zsh-syntax-highlighting}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-# this is need changed to adhoc way.
+    # this is need changed to adhoc way.
     export PATH=$HOME/.npm-global/bin:$PATH
     export ZVM_VI_SURROUND_BINDKEY=s-prefix
     export ZVM_VI_INSERT_ESCAPE_BINDKEY=jk

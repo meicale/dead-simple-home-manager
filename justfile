@@ -83,3 +83,11 @@ sync USER HOST:
 
 sync-secrets USER HOST:
   rsync -av --filter=':- .gitignore' -e "ssh -l {{USER}}" . {{USER}}@{{HOST}}:nix-secrets/
+
+# Restart nix-daemon service (useful when moving store or troubleshooting)
+restart-nix:
+	sudo systemctl stop nix-daemon.service
+	sudo systemctl restart nix-daemon.socket
+	sudo systemctl start nix-daemon.service
+	echo "nix-daemon restarted successfully"
+alias rnd := restart-nix
