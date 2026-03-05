@@ -1,73 +1,74 @@
 { pkgs, nixvim, ... }:
 {
-  # 移除或注释掉当前有问题的 nixvim 配置
-  # programs.nixvim.enable = true;
-# TODO: add keys for which key, harpoon, etc.
-# TODO: add nerd fonts to this.
   programs.nixvim = {
     enable = true;
     defaultEditor = false;
 
     extraConfigLua = ''
-      -- Print a little welcome message when nvim is opened!
-      print("Hi, I'm nixvim!")
+      -- VS Code 集成支持
+      if vim.g.vscode then
+        -- VS Code 特定配置
+        print("Hi, I'm nixvim in VS Code!")
+      else
+        -- 普通 Neovim 配置
+        print("Hi, I'm nixvim!")
+      end
     '';
 
-    # options = {
-    #   # number = true;         # Show line numbers
-    #   # relativenumber = true; # Show relatimve line numbers
-    #   shiftwidth = 2;        # Tab width should be 2
-    # };
+    plugins = {
+      # 基础编辑功能
+      comment.enable = true;
+      treesitter.enable = true;
+      treesitter-context.enable = true;
+      treesitter-refactor.enable = true;
+      rainbow-delimiters.enable = true;
+      vim-surround.enable = true;
+      leap.enable = true;
+      indent-blankline.enable = true;
+      gitsigns.enable = true;
+      
+      # 文件管理
+      neo-tree.enable = true;
+      oil.enable = true;
+      
+      # 工具和增强
+      bufferline.enable = true;
+      diffview.enable = true;
+      easyescape.enable = true;
+      fugitive.enable = true;
+      harpoon.enable = true;
+      nvim-bqf.enable = true;
+      colorizer.enable = true;
+      markdown-preview.enable = true;
+      lightline.enable = true;
+      nix.enable = true;
+      neorg.enable = true;
+      web-devicons.enable = true;
+    };
 
-#     # colorschemes.gruvbox.enable = true;
-#     # plugins.alpha.enable = true;
-    plugins.bufferline.enable = true;
-    plugins.comment.enable = true;
-    plugins.diffview.enable = true;
-    plugins.easyescape.enable = true;
-    plugins.treesitter.enable = true;
-    plugins.treesitter-context.enable = true;
-    plugins.treesitter-refactor.enable = true;
-    plugins.rainbow-delimiters.enable = true;
-    plugins.vim-surround.enable = true;
-    plugins.web-devicons.enable = true;
-    plugins.neorg.enable = true;
-    plugins.neo-tree.enable = true;
-    plugins.nix.enable = true;
-    plugins.fugitive.enable = true;
-    plugins.gitsigns.enable = true;
-    plugins.harpoon.enable = true;
-    plugins.indent-blankline.enable = true;
-    plugins.leap.enable = true;
-    plugins.nvim-bqf.enable = true;
-    plugins.colorizer.enable = true;  # 使用新的插件名称
-    plugins.oil.enable = true;
-    plugins.markdown-preview.enable = true;
-    plugins.lightline.enable = true;
+    # LSP 配置
+    plugins.lsp.enable = true;
+    plugins.lsp.servers.pyright.enable = true;
+    plugins.lsp.servers.nixd.enable = true;
 
-
-    # plugins.flash.enable = true;
-    # plugins.flash.settings.label.after = [0 2];  # 修改后的属性路径
-    # keymaps = [
-    #   {
-    #     mode = "n";
-    #     key = "s";
-    #     action = "require('flash').jump";
-    #     lua = true;
-    #   }
-    # ];
-
-    # 需要设置相应的安装程序，也就是 lsp 服务器
-    # plugins.lsp.enable = true;
-    # plugins.lsp.servers.pyright.enable = true;
-    # plugins.lsp.servers.nixd.enable = true;
-
-    # # TODO: enable which-key
-#     plugins.which-key.enable = true;
-#     plugins.wilder.enable = true;
-#     extraPlugins = with pkgs.vimPlugins; [
-#       vim-nix
-#     ];
+    # 额外插件 - VS Code 集成相关
+    extraPlugins = with pkgs.vimPlugins; [
+      vim-nix
+      # LazyVim VS Code 集成所需的插件
+      dial-nvim
+      flit-nvim
+      leap-nvim
+      mini-ai
+      mini-comment
+      mini-move
+      mini-pairs
+      mini-surround
+      nvim-treesitter
+      nvim-treesitter-textobjects
+      nvim-ts-context-commentstring
+      vim-repeat
+      yanky-nvim
+    ];
 
   };
 

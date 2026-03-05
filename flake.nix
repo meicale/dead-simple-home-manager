@@ -22,13 +22,27 @@
         inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, nixvim, }: {
+  inputs.worktrunk = {
+        url = "github:max-sixty/worktrunk";
+        inputs.nixpkgs.follows = "nixpkgs";
+  };
+
+  outputs = { self, nixpkgs, home-manager, nixvim, worktrunk, }: {
     homeConfigurations = {
       "bill" = home-manager.lib.homeManagerConfiguration ({
-        modules = [ nixvim.homeManagerModules.nixvim (import ./home.nix) ];
+        modules = [ nixvim.homeManagerModules.nixvim
+          ({ pkgs, ... }: {
+            nixpkgs.overlays = [
+              (final: prev: {
+                worktrunk = worktrunk.packages."x86_64-linux".default;
+              })
+            ];
+          })
+          (import ./home.nix)
+        ];
         pkgs = import nixpkgs {
           system = "x86_64-linux";
-          # config.allowUnfree = true;
+          config.allowUnfree = true;
         };
 
       });

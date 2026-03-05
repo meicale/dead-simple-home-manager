@@ -5,7 +5,7 @@ SHARED_BASE="/mnt/wsl/persistent"
 
 # 确保共享目录存在
 mkdir -p "$SHARED_BASE"/{cache,data,state,conda/{envs,pkgs}}
-mkdir -p "$SHARED_BASE"/cache/{huggingface,pip,uv,poetry,torch,node,yarn,npm,go-build,cargo,atuin}
+mkdir -p "$SHARED_BASE"/cache/{huggingface,pip,uv,poetry,torch,node,yarn,npm,go-build,cargo,atuin,llama.cpp}
 mkdir -p "$SHARED_BASE"/data/{atuin,zoxide,direnv,pipx}
 mkdir -p "$SHARED_BASE"/state/nix
 
@@ -16,8 +16,8 @@ export XDG_STATE_HOME="$SHARED_BASE/state"
 
 # Python相关
 export HF_HOME="$XDG_CACHE_HOME/huggingface"
-export HUGGINGFACE_HUB_CACHE="$HF_HOME"
-export TRANSFORMERS_CACHE="$HF_HOME/hub"
+export HUGGINGFACE_HUB_CACHE="$HF_HOME/hub"
+export TRANSFORMERS_CACHE="$HF_HOME/transformers/"
 export PIP_CACHE_DIR="$XDG_CACHE_HOME/pip"
 export UV_CACHE_DIR="$XDG_CACHE_HOME/uv"
 export POETRY_CACHE_DIR="$XDG_CACHE_HOME/poetry"
@@ -56,6 +56,8 @@ export _ZO_DATA_DIR="$XDG_DATA_HOME/zoxide"
 export DIRENV_LOG_FORMAT=""
 export DIRENV_WATCHES="$XDG_DATA_HOME/direnv/watches"
 
+export LLAMA_CACHE="$XDG_CACHE_HOME/llama.cpp"
+
 # 创建必要的符号链接（仅在不存在时）
 create_symlink() {
     local target="$1"
@@ -77,6 +79,7 @@ create_symlink "$XDG_CACHE_HOME/torch" "$HOME/.cache/torch"
 create_symlink "$CONDA_ENVS_PATH" "$HOME/.conda/envs"
 create_symlink "$CONDA_PKGS_DIRS" "$HOME/.conda/pkgs"
 create_symlink "$MAMBA_ROOT_PREFIX" "$HOME/.micromamba"
+create_symlink "$LLAMA_CACHE" "$HOME/.cache/llama.cpp"
 
 # 缓存路径查看函数
 cache_paths() {
@@ -111,8 +114,12 @@ clean_cache() {
             echo "清理所有缓存..."
             rm -rf "$XDG_CACHE_HOME"/*
             rm -rf "$CONDA_PKGS_DIRS"/*
-            mkdir -p "$XDG_CACHE_HOME"/{huggingface,pip,uv,poetry,torch,node,yarn,npm,go-build,cargo,atuin}
+            mkdir -p "$XDG_CACHE_HOME"/{huggingface,pip,uv,poetry,torch,node,yarn,npm,go-build,cargo,atuin,llama.cpp}
             mkdir -p "$CONDA_PKGS_DIRS"
+            ;;
+        "llama"|"llama.cpp")
+            echo "清理Llama.cpp缓存..."
+            rm -rf "$LLAMA_CACHE"/*
             ;;
         "hf"|"huggingface")
             echo "清理HuggingFace缓存..."
