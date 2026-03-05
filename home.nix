@@ -177,7 +177,7 @@ in
   #   # libraries = true;
   # };
 
-  programs.zsh.initExtra= ''
+  programs.zsh.initContent= ''
       # 加载缓存配置
       if [ -f ~/.cache_config.sh ]; then
           source ~/.cache_config.sh
