@@ -36,7 +36,7 @@ in
 
   # 在home-manager switch时执行缓存配置
   home.activation.setupCache = lib.hm.dag.entryAfter ["writeBoundary"] ''
-    echo "设置缓存路径映射..."
+    # echo "设置缓存路径映射..."
     if [ -f "${config.home.homeDirectory}/.cache_config.sh" ]; then
         bash "${config.home.homeDirectory}/.cache_config.sh"
     fi
@@ -96,8 +96,7 @@ in
 
   # UV配置
   home.file.".config/uv/uv.toml".text = ''
-    [cache]
-    dir = "${uvCacheDir}"
+    cache-dir = "${uvCacheDir}"
   '';
 
   # Pip配置
@@ -127,11 +126,11 @@ in
   programs.bash = {
     enable = true;
     profileExtra = ''
-      echo "加载bash profile配置"
+      # echo "加载bash profile配置"
 
       # 等待挂载完成（如果需要）
       wait_for_mount() {
-          echo "等待挂载 /mnt/wsl/persistent..."
+          # echo "等待挂载 /mnt/wsl/persistent..."
           local max_wait=5
           local count=0
           while ! mount | grep -q '/mnt/wsl/persistent' && [ $count -lt $max_wait ]; do
@@ -147,16 +146,16 @@ in
         return
       fi
       if [ -z "$ZSH_EXECUTION_STRING" ] && [ -t 1 ]; then
-        echo "wsl 登录，切换到zsh"
+        # echo "wsl 登录，切换到zsh"
         exec zsh
       fi
 
     '';
     bashrcExtra = ''
-      echo "加载bashrc配置"
+      # echo "加载bashrc配置"
       # 非登录Shell也自动切换到zsh
       if [ -z "$ZSH_EXECUTION_STRING" ] && [ -t 1 ]; then
-        echo "ide 登录，切换到zsh"
+        # echo "ide 登录，切换到zsh"
         exec zsh
       fi
 
