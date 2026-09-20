@@ -21,6 +21,12 @@ let
   # PyTorch相关路径
   torchCacheDir = "${xdgCacheHome}/torch";
 
+   # 选择 CUDA 版本;若你的 channel 支持,可写成 cudaPackages_13
+  cuda = pkgs.cudaPackages;
+
+  # 非 Nix 的 llama-server 目录
+  llamaDir = "/mnt/wsl/workspace/Bonsai-demo/bin/cuda";
+
 in
 {
   imports = [
@@ -91,7 +97,7 @@ in
   # Poetry配置
   home.file.".config/pypoetry/config.toml".text = ''
     [cache-dir]
-    "${poetryCacheDir}"
+    cache-dir = "${poetryCacheDir}"
   '';
 
   # UV配置
@@ -138,7 +144,7 @@ in
               count=$((count + 1))
           done
       }
-      
+
       wait_for_mount
 
       # eval "$(wt config shell init bash)" # this is useless, it jump to zsh
@@ -188,7 +194,7 @@ in
     elif [ -f ~/.cache_config.sh ]; then
         source ~/.cache_config.sh
     fi
-    
+
     # # 确保缓存目录存在
     # mkdir -p ${xdgCacheHome}/zsh
     # mkdir -p ${xdgDataHome}/zsh
@@ -294,6 +300,7 @@ in
     bat
     black
     btop
+    bun
     # btop-cuda
     # cargo
     cmake
@@ -331,9 +338,12 @@ in
     # modify config file to use it.
     # proxychains-ng # avoid rebuild nix to run
     opencc
+    opencode
     papis
+    # pi-coding-agent
     poetry
     postgresql
+    # raylib
     ripgrep
     rustup
     rsync
@@ -360,7 +370,7 @@ in
     yq-go
     zathura
     zellij
-    # zig
+    zig
     # zoxide
 
     zsh
@@ -397,6 +407,7 @@ in
     # '')
   ] ++ lib.optionals isLinux [
     # GNU/Linux packages
+    dos2unix
   ]
   ++ lib.optionals isDarwin [
     # macOS packages

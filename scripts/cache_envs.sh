@@ -11,7 +11,7 @@ export XDG_STATE_HOME="$SHARED_BASE/state"
 
 # Python相关
 export HF_HOME="$XDG_CACHE_HOME/huggingface"
-export HUGGINGFACE_HUB_CACHE="$HF_HOME/hub"
+export HF_HUB_CACHE="$HF_HOME/hub"
 export TRANSFORMERS_CACHE="$HF_HOME/transformers/"
 export PIP_CACHE_DIR="$XDG_CACHE_HOME/pip"
 export UV_CACHE_DIR="$XDG_CACHE_HOME/uv"
@@ -56,75 +56,76 @@ export LLAMA_CACHE="$XDG_CACHE_HOME/llama.cpp"
 
 # 创建必要的符号链接（仅在不存在时）
 create_symlink() {
-    local target="$1"
-    local link="$2"
-    
-    if [ ! -e "$link" ]; then
-        mkdir -p "$(dirname "$link")"
-        ln -s "$target" "$link"
-        echo "Created symlink: $link -> $target"
-    fi
+  local target="$1"
+  local link="$2"
+
+  if [ ! -e "$link" ]; then
+    mkdir -p "$(dirname "$link")"
+    ln -s "$target" "$link"
+    echo "Created symlink: $link -> $target"
+  fi
 }
 
 # 缓存路径查看函数
 cache_paths() {
-    echo "=== 缓存路径映射 ==="
-    echo "共享基础路径: $SHARED_BASE"
-    echo "XDG_CACHE_HOME: $XDG_CACHE_HOME"
-    echo "XDG_DATA_HOME: $XDG_DATA_HOME"
-    echo "XDG_STATE_HOME: $XDG_STATE_HOME"
-    echo ""
-    echo "=== 具体缓存路径 ==="
-    echo "HuggingFace: $HF_HOME"
-    echo "Pip: $PIP_CACHE_DIR"
-    echo "UV: $UV_CACHE_DIR"
-    echo "Poetry: $POETRY_CACHE_DIR"
-    echo "PyTorch: $TORCH_HOME"
-    echo "Conda环境: $CONDA_ENVS_PATH"
-    echo "Conda包缓存: $CONDA_PKGS_DIRS"
-    echo "MicroMamba根目录: $MAMBA_ROOT_PREFIX"
-    echo ""
-    echo "=== 符号链接状态 ==="
-    ls -la "$HOME/.cache/" | grep -E "(huggingface|pip|uv|poetry|torch)"
-    ls -la "$HOME/.conda/" | grep -E "(envs|pkgs)"
-    ls -la "$HOME/" | grep micromamba
+  echo "=== 缓存路径映射 ==="
+  echo "共享基础路径: $SHARED_BASE"
+  echo "XDG_CACHE_HOME: $XDG_CACHE_HOME"
+  echo "XDG_DATA_HOME: $XDG_DATA_HOME"
+  echo "XDG_STATE_HOME: $XDG_STATE_HOME"
+  echo ""
+  echo "=== 具体缓存路径 ==="
+  echo "HuggingFace: $HF_HOME"
+  echo "Pip: $PIP_CACHE_DIR"
+  echo "UV: $UV_CACHE_DIR"
+  echo "Poetry: $POETRY_CACHE_DIR"
+  echo "PyTorch: $TORCH_HOME"
+  echo "Conda环境: $CONDA_ENVS_PATH"
+  echo "Conda包缓存: $CONDA_PKGS_DIRS"
+  echo "MicroMamba根目录: $MAMBA_ROOT_PREFIX"
+  echo ""
+  echo "=== 符号链接状态 ==="
+  ls -la "$HOME/.cache/" | grep -E "(huggingface|pip|uv|poetry|torch)"
+  ls -la "$HOME/.conda/" | grep -E "(envs|pkgs)"
+  ls -la "$HOME/" | grep micromamba
 }
 
 # 清理缓存函数
 clean_cache() {
-    local cache_type="$1"
-    
-    case "$cache_type" in
-        "all")
-            echo "清理所有缓存..."
-            rm -rf "$XDG_CACHE_HOME"/*
-            rm -rf "$CONDA_PKGS_DIRS"/*
-            mkdir -p "$XDG_CACHE_HOME"/{huggingface,pip,uv,poetry,torch,node,yarn,npm,go-build,cargo,atuin,llama.cpp}
-            mkdir -p "$CONDA_PKGS_DIRS"
-            ;;
-        "llama"|"llama.cpp")
-            echo "清理Llama.cpp缓存..."
-            rm -rf "$LLAMA_CACHE"/*
-            ;;
-        "hf"|"huggingface")
-            echo "清理HuggingFace缓存..."
-            rm -rf "$HF_HOME"/*
-            ;;
-        "pip")
-            echo "清理Pip缓存..."
-            rm -rf "$PIP_CACHE_DIR"/*
-            ;;
-        "torch")
-            echo "清理PyTorch缓存..."
-            rm -rf "$TORCH_HOME"/*
-            ;;
-        "conda")
-            echo "清理Conda/MicroMamba包缓存..."
-            rm -rf "$CONDA_PKGS_DIRS"/*
-            mkdir -p "$CONDA_PKGS_DIRS"
-            ;;
-        *)
-            echo "用法: clean_cache [all|hf|pip|torch|conda]"
-            ;;
-    esac
+  local cache_type="$1"
+
+  case "$cache_type" in
+  "all")
+    echo "清理所有缓存..."
+    rm -rf "$XDG_CACHE_HOME"/*
+    rm -rf "$CONDA_PKGS_DIRS"/*
+    mkdir -p "$XDG_CACHE_HOME"/{huggingface,pip,uv,poetry,torch,node,yarn,npm,go-build,cargo,atuin,llama.cpp}
+    mkdir -p "$CONDA_PKGS_DIRS"
+    ;;
+  "llama" | "llama.cpp")
+    echo "清理Llama.cpp缓存..."
+    rm -rf "$LLAMA_CACHE"/*
+    ;;
+  "hf" | "huggingface")
+    echo "清理HuggingFace缓存..."
+    rm -rf "$HF_HOME"/*
+    ;;
+  "pip")
+    echo "清理Pip缓存..."
+    rm -rf "$PIP_CACHE_DIR"/*
+    ;;
+  "torch")
+    echo "清理PyTorch缓存..."
+    rm -rf "$TORCH_HOME"/*
+    ;;
+  "conda")
+    echo "清理Conda/MicroMamba包缓存..."
+    rm -rf "$CONDA_PKGS_DIRS"/*
+    mkdir -p "$CONDA_PKGS_DIRS"
+    ;;
+  *)
+    echo "用法: clean_cache [all|hf|pip|torch|conda]"
+    ;;
+  esac
 }
+
