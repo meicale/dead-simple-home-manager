@@ -3,6 +3,7 @@
 
 # 共享存储基础路径
 SHARED_BASE="/mnt/wsl/persistent"
+SHAREDWORKSPACE="/mnt/wsl/workspace"
 
 # 设置XDG环境变量
 export XDG_CACHE_HOME="$SHARED_BASE/cache"
@@ -14,7 +15,8 @@ export HF_HOME="$XDG_CACHE_HOME/huggingface"
 export HF_HUB_CACHE="$HF_HOME/hub"
 export TRANSFORMERS_CACHE="$HF_HOME/transformers/"
 export PIP_CACHE_DIR="$XDG_CACHE_HOME/pip"
-export UV_CACHE_DIR="$XDG_CACHE_HOME/uv"
+# export UV_CACHE_DIR="$XDG_CACHE_HOME/uv"
+export UV_CACHE_DIR="$SHAREDWORKSPACE/UV_CACHE"
 export POETRY_CACHE_DIR="$XDG_CACHE_HOME/poetry"
 
 # PyTorch相关
@@ -51,6 +53,8 @@ export DIRENV_LOG_FORMAT=""
 export DIRENV_WATCHES="$XDG_DATA_HOME/direnv/watches"
 
 export LLAMA_CACHE="$XDG_CACHE_HOME/llama.cpp"
+
+export JUST_FOR_TEST="THIS_IS_DONE_IN_CACHE_ENVS.sh"
 
 # 工具函数
 
@@ -128,4 +132,3 @@ clean_cache() {
     ;;
   esac
 }
-

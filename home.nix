@@ -5,6 +5,7 @@ let
   unsupported = builtins.abort "Unsupported platform";
   # 共享存储基础路径（可根据实际情况调整）
   sharedBase = if isLinux then "/mnt/wsl/persistent" else "/Volumes/persistent" ;
+  sharedWorkSpace = if isLinux then "/mnt/wsl/workspace" else "/Volumes/workspace" ;
 
   # XDG目录路径
   xdgCacheHome = "${sharedBase}/cache";
@@ -14,7 +15,7 @@ let
   # Python相关路径
   hfCacheDir = "${xdgCacheHome}/huggingface";
   pipCacheDir = "${xdgCacheHome}/pip";
-  uvCacheDir = "${xdgCacheHome}/uv";
+  uvCacheDir = "${sharedWorkSpace}/UV_CACHE";
   poetryCacheDir = "${xdgCacheHome}/poetry";
   condaEnvDir = "${sharedBase}/conda/envs";
 
@@ -151,7 +152,7 @@ in
       if [ -n "$BASH_EXECUTION_STRING" ]; then
         return
       fi
-      if [ -z "$ZSH_EXECUTION_STRING" ] && [ -t 1 ]; then
+      if [ -z "$ZSH_EXECUTION_STRING" ] && [ -z "$IN_NIX_SHELL" ] && [ -t 1 ]; then
         # echo "wsl 登录，切换到zsh"
         exec zsh
       fi
@@ -160,7 +161,7 @@ in
     bashrcExtra = ''
       # echo "加载bashrc配置"
       # 非登录Shell也自动切换到zsh
-      if [ -z "$ZSH_EXECUTION_STRING" ] && [ -t 1 ]; then
+      if [ -z "$ZSH_EXECUTION_STRING" ] && [ -z "$IN_NIX_SHELL" ] && [ -t 1 ]; then
         # echo "ide 登录，切换到zsh"
         exec zsh
       fi
@@ -217,9 +218,9 @@ in
     export ZVM_VI_SURROUND_BINDKEY=s-prefix
     export ZVM_VI_INSERT_ESCAPE_BINDKEY=jk
     export ZVM_VI_EDITOR="${config.home.homeDirectory}/.cli_tmux_editor.sh"
-    export CUDA_HOME=/usr/local/cuda
-    export PATH=$CUDA_HOME/bin:$PATH
-    export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$LD_LIBRARY_PAT
+    # export CUDA_HOME=/usr/local/cuda
+    # export PATH=$CUDA_HOME/bin:$PATH
+    export LD_LIBRARY_PATH=/usr/lib/wsl/lib:$CUDA_HOME/lib64:$LD_LIBRARY_PATH
     source "${config.home.homeDirectory}/alias.sh"
     eval "$(starship init zsh)"
     function zsh_vi_mode_init() {
@@ -284,6 +285,8 @@ in
       yzhang.markdown-all-in-one
     ];
   };
+
+  nixpkgs.config.allowUnfree = true;
 
   home.packages = with pkgs; ([
     # # Adds the 'hello' command to your environment. It prints a friendly
