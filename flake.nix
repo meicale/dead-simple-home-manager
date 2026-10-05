@@ -27,10 +27,17 @@
         inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { self, nixpkgs, home-manager, nixvim, worktrunk, }: {
+  inputs = {
+          impermanence.url = "github:nix-community/impermanence";
+# this doesn't wowk, left it here since it break nothing.
+  };
+
+  outputs = { self, nixpkgs, home-manager, nixvim, worktrunk, impermanence, }: {
     homeConfigurations = {
       "bill" = home-manager.lib.homeManagerConfiguration ({
-        modules = [ nixvim.homeManagerModules.nixvim
+        modules = [
+          nixvim.homeManagerModules.nixvim
+          # impermanence.homeManagerModules.impermanence # this cause a error
           ({ pkgs, ... }: {
             nixpkgs.overlays = [
               (final: prev: {
